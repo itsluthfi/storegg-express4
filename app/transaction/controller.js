@@ -26,8 +26,6 @@ module.exports = {
     try {
 
       const { id } = req.params
-      console.log("id >>")
-      console.log(id)
       const { status } = req.query
 
       await Transaction.findByIdAndUpdate({_id : id}, { status })
