@@ -166,8 +166,10 @@ module.exports = {
       ]);
 
       res.status(200).json({
-        data: history,
-        total: total.length ? total[0].value : 0,
+        data: {
+          data: history,
+          total: total.length ? total[0].value : 0,
+        },
       });
     } catch (err) {
       res.status(500).json({ message: err.message || `Internal server error` });
@@ -215,7 +217,7 @@ module.exports = {
         .populate('category')
         .sort({ updatedAt: -1 });
 
-      res.status(200).json({ data: history, count: count });
+      res.status(200).json({ data: { data: history, count: count } });
     } catch (err) {
       res.status(500).json({ message: err.message || `Internal server error` });
     }
@@ -240,6 +242,7 @@ module.exports = {
 
   editProfile: async (req, res, next) => {
     try {
+      const { id } = req.params;
       const { name = '', phoneNumber = '' } = req.body;
 
       const payload = {};
@@ -265,7 +268,7 @@ module.exports = {
         src.pipe(dest);
 
         src.on('end', async () => {
-          let player = await Player.findOne({ _id: req.player._id });
+          let player = await Player.findOne({ _id: id });
 
           let currentImage = `${config.rootPath}/public/uploads/${player.avatar}`;
           if (fs.existsSync(currentImage)) {
@@ -274,7 +277,7 @@ module.exports = {
 
           player = await Player.findOneAndUpdate(
             {
-              _id: req.player._id,
+              _id: id,
             },
             {
               ...payload,
@@ -299,7 +302,7 @@ module.exports = {
       } else {
         const player = await Player.findOneAndUpdate(
           {
-            _id: req.player._id,
+            _id: id,
           },
           payload,
           { new: true, runValidators: true }
